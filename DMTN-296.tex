@@ -38,7 +38,7 @@ Peter Ferguson
 % \setDocCurator{The Curator of this Document}
 
 \setDocAbstract{%
-We describe several avenues toward assessing the depth of LSST observations using source catalogs and exposure summary statistics. We validate these estimates against each other, and against predicted depth estimates from the LSS Operations Simulator.
+We describe several avenues toward assessing the depth of LSST observations using source catalogs and exposure summary statistics. We validate these estimates against each other, and against predicted depth estimates from the LSST Operations Simulator.
 }
 
 % Change history defined here.
@@ -46,9 +46,10 @@ We describe several avenues toward assessing the depth of LSST observations usin
 % Fields: VERSION, DATE, DESCRIPTION, OWNER NAME.
 % See LPM-51 for version number policy.
 \setDocChangeRecord{%
+  \addtohist{2}{2024-11-29}{Addressing review comments.}{Alex Drlica-Wagner}
   \addtohist{1}{2024-10-16}{First complete draft.}{Alex Drlica-Wagner}
 }
-\setDocDate{2024-10-16}
+\setDocDate{2024-11-29}
 
 \begin{document}
 
@@ -62,9 +63,9 @@ We describe several avenues toward assessing the depth of LSST observations usin
 
 \section{Introduction}
 
-The ``depth'' of a survey is colloquially used to describe the faintest astronomical object that can be detected and accurately measured. However, because astronomical objects cover a broad range of shapes and sizes, and surveys have variable performance along many avenues (angular resolution, sky brightness, instrumental noise, etc.), there is no unique definition for ``depth''. Thus, it is conventional to specify precise depth metrics that can be uniquely defined in terms of the properties of the survey. While several metrics have been proposed and used by astronomical surveys \citep[e.g.,][]{Rykoff:2015, DES-DR2}, LSST has focused primarily on measurements of the limiting magnitude for unresolved, point-like sources detected at a signal-to-noise ratio ($SNR$) of $5$. This metric is canonically referred to as  ``$m5$'' or in common speech as the ``5$\sigma$ limiting magnitude'' \citep[e.g.,][]{SMTN-002}. Of course, the depth can be calculated at an arbitrary SNR, though ${SNR} = 5$ ($m5$) and ${SNR} = 10$ ($m10$) are the most common values chosen.
+The ``depth'' of a survey is colloquially used to describe the faintest astronomical object that can be detected and accurately measured. However, because astronomical objects cover a broad range of shapes and sizes, and surveys have variable performance along many avenues (angular resolution, sky brightness, instrumental noise, etc.), there is no unique definition for ``depth''. Thus, it is conventional to specify precise depth metrics that can be uniquely defined in terms of the properties of the survey. Although several metrics have been proposed and used by astronomical surveys \citep[e.g.,][]{Rykoff:2015, DES-DR2}, LSST has focused primarily on measurements of the limiting magnitude for unresolved point-like sources detected at a signal-to-noise ratio ($SNR$) of $5$. This metric is canonically referred to as  ``$m5$'' or in common speech as the ``5$\sigma$ limiting magnitude'' \citep[e.g.,][]{SMTN-002}. Of course, the depth can be calculated at an arbitrary SNR, although ${SNR} = 5$ ($m5$) and ${SNR} = 10$ ($m10$) are the most common values chosen.
 
-Several documents have laid out the approach to calculating $m5$ in terms of the properties of the LSST system. In particular, \citet{LSE-40} provided a quantitative derivation of $m5$, which has been used to set the LSST System Requirements (LSR) \citep{LSE-29}. More recently, \citet{SMTN-002} provided a framework to predicted $m5$ given up-to-date LSST system throughputs and to rapidly calculate $m5$ for the LSST Operations Simulator (OpSim). Here, we translate the established framework for calculating $m5$ into the LSST Science Pipelines in order to provide self-consistent estimates of $5\sigma$ limiting magnitude.\footnote{The code for the analyses described here can be found in \href{https://github.com/lsst-dm/vv-team-notebooks/tree/main/notebooks}{\texttt{DM-45573\_Depth\_Estimates.ipynb}}.} In particular, we estimate the depth in two different and complementary ways: (1) directly from the catalogs by selecting point-like sources that have measured ${SNR} \approx 5$, and (2) from summary statistics (i.e., seeing, sky brightness, transparency, read noise) that are calculated on a per-exposure basis. While these are different techniques for measuring the noise, they both share the same analytic calculation of the variance (i.e., the catalog flux uncertainties come from the variance plane, which is calculated from the same information as the exposure summary statistics). Inaccuracy in the analytic variance would thus be manifested in both estimates. A third complementary and more independent technique would be to measure the variance directly from repeated observations of faint (or sky) sources. This direct variance measurement is an important validation of the analytic variance calculation; however, it is subject to biases from the presence of sub-threshold sources \citep[e.g.,][]{Eckert:2020}. The direct estimation of the variance from repeat observations is left to future work.
+Several documents have laid out the approach to calculating $m5$ in terms of the properties of the LSST system. In particular, \citet{LSE-40} provided a quantitative derivation of $m5$, which has been used to set the LSST System Requirements (LSR) \citep{LSE-29}. More recently, \citet{SMTN-002} provided a framework for predicting $m5$ given current LSST system throughputs and rapidly calculating $m5$ for the LSST Operations Simulator (OpSim). Here, we translate the established framework for calculating $m5$ into the LSST Science Pipelines in order to provide self-consistent estimates of $5\sigma$ limiting magnitude.\footnote{The code for the analyses described here can be found in \href{https://github.com/lsst-dm/vv-team-notebooks/tree/main/notebooks}{\texttt{DM-45573\_Depth\_Estimates.ipynb}}.} In particular, we estimate the depth in two different and complementary ways: (1) directly from the catalogs by selecting point-like sources that have measured ${SNR} \approx 5$, and (2) from summary statistics (i.e., seeing, sky brightness, transparency, read noise) that are calculated on a per-exposure basis. While these are different techniques for measuring the noise, they both share the same analytic calculation of the variance (i.e., the catalog flux uncertainties come from the variance plane, which is calculated from the same information as the exposure summary statistics). Inaccuracy in the analytic variance would thus be manifested in both estimates. A third complementary and more independent technique would be to measure the variance directly from repeated observations of faint (or sky) sources. This direct variance measurement is an important validation of the analytic variance calculation; however, it is subject to biases from the presence of sub-threshold sources \citep[e.g.,][]{Eckert:2020}. The direct estimation of the variance from repeat observations is left to future work.
 
 \section{Depth Estimates Using Object Catalogs}
 
@@ -83,7 +84,7 @@ An alternative approach involves solving Pogson's equation \citep{Pogson:1856} t
 For the most commonly chosen depth estimates of $SNR = 5$ and $SNR = 10$, this yields the familiar limiting magnitude uncertainties: $\sigma_{m5} \approx 0.2171$ and $\sigma_{m10} \approx 0.1086$. In this case, a common algorithmic approach is to fit the relationship between magnitude error and magnitude for point-like sources, and then interpolate/extrapolate to the magnitude at which the magnitude error matches the desired value (i.e., $\sigma_{m5}$ or $\sigma_{m10}$).
 Examples of these two approaches are shown in Figure~\ref{fig:maglim} using simulated data from Operations Rehearsal 4 (OR4).
 
-While catalog-based depth estimates are a direct way to estimate the depth of a survey, they have several draw backs: (1) To accurately estimate $m5$ it is necessary to select point-like sources. This can be challenging to do robustly for faint sources (i.e., at ${SNR} \sim 5$). (2) For small regions of the sky, the number of sources selected may be small, leading to statistical noise (and possibly algorithmic failures) in the measurements. (3) Catalogs must be accessed and analyzed to determine these metrics, which can be a disk and memory intensive task. 
+While catalog-based depth estimates are a direct way to estimate the depth of a survey, they have several drawbacks: (1) To accurately estimate $m5$ it is necessary to select point-like sources. This can be challenging to do robustly for faint sources (i.e., at ${SNR} \sim 5$). (2) For small regions of the sky, the number of sources selected may be small, leading to statistical noise (and possibly algorithmic failures) in the measurements. (3) Catalogs must be accessed and analyzed to determine these metrics, which can be a disk and memory intensive task. 
 
 \begin{figure*}[t]
     \includegraphics[width=\textwidth]{figures/or4_maglim_catalog.pdf}
@@ -191,13 +192,13 @@ where we define $m5_{\rm sky} = m(SNR=5, B, n_{\rm eff,fid}, ZP_{\rm fid}, \sigm
 \label{sec:coadd_depth}
 
 
-The $m5$ depth of a coadded image can be easily computed from the depth of individual images assuming the uncertainty on the (top-of-the-atmosphere) flux of a source, $f$, is uncorrelated between the individual images that contribute to the coadd. In this case, we can use the standard formula for propagation of errors in an inverse-variance-weighted mean to get the coadd uncertainty,
+The $m5$ depth of a coadded image can be easily computed from the depth of individual images assuming that the uncertainty on the (top-of-the-atmosphere) flux of a source, $f$, is uncorrelated between the individual images that contribute to the coadd. In this case, we can use the standard formula for propagation of errors in an inverse-variance-weighted mean to get the coadd uncertainty,
 \begin{equation}
 \label{eqn:ivwpoe}
 \sigma_{f,\rm{coadd}}^{-2} = \sum_i \sigma_{f,i}^{-2}.
 \end{equation}
-This formula holds when $\sigma_{f,i}$ is the standard deviation in the top-of-the atmosphere flux, $f$, for input image $i$.
-In this situation the flux is independent of exposure time, and Eq.~\ref{eqn:ivwpoe} makes it clear that two exposures of different exposure times but the same uncertainty ($\sigma_{f,i} = \sigma_{f,j}$) will have the same contribution to the coadded flux uncertainty, $\sigma_{f, {\rm coadd}}$.
+This formula holds when $\sigma_{f,i}$ is the standard deviation in the top-of-the-atmosphere flux, $f$, for input image $i$.
+In this situation, the flux is independent of exposure time, and Eq.~\ref{eqn:ivwpoe} makes it clear that two exposures of different exposure times but the same uncertainty ($\sigma_{f,i} = \sigma_{f,j}$) will have the same contribution to the coadded flux uncertainty, $\sigma_{f, {\rm coadd}}$.
 
 Transforming our equation for the limiting magnitude (Eq.~\ref{eqn:stats_maglim}) from counts in the image, $C$, to flux, $f$,
 \begin{align}
@@ -310,8 +311,6 @@ where \texttt{seeingFwhmEff}, \texttt{zeropoint}, and \texttt{skycounts} are nat
 
 \clearpage
 
-
-
 % Include all the relevant bib files.
 % https://lsst-texmf.lsst.io/lsstdoc.html#bibliographies
 \section{References} \label{sec:bib}
@@ -327,7 +326,6 @@ where \texttt{seeingFwhmEff}, \texttt{zeropoint}, and \texttt{skycounts} are nat
 \end{document}
 
 \begin{comment}
-
 \section{Flux Variance Derivation}
 
 In Section~\ref{sec:teff} we derived the flux variance from the SNR. However, it may be useful to see how the flux variance can be derived directly from the variance on the counts. The top of the atmosphere count rate (ADU/second), $f$, is derived from the electrons counted in the image from the object, $e$, in the exposure time, $t$ (seconds), corrected by the atmospheric transmission coefficient $\eta$ and gain, $g$ (e-/ADU),
