@@ -46,10 +46,11 @@ We describe several avenues toward assessing the depth of LSST observations usin
 % Fields: VERSION, DATE, DESCRIPTION, OWNER NAME.
 % See LPM-51 for version number policy.
 \setDocChangeRecord{%
+  \addtohist{3}{2025-11-11}{Fixed typo in source counts equation.}{Alex Drlica-Wagner}
   \addtohist{2}{2024-11-29}{Addressing review comments.}{Alex Drlica-Wagner}
   \addtohist{1}{2024-10-16}{First complete draft.}{Alex Drlica-Wagner}
 }
-\setDocDate{2024-11-29}
+\setDocDate{2025-11-11}
 
 \begin{document}
 
@@ -135,7 +136,7 @@ it can be seen that
 Solving for the positive root of the quadratic SNR equation for $C$, it can be shown that the source counts can be expressed as,
 \begin{equation}
     \label{eqn:counts}
-    C(SNR, n_{\rm eff}, B, \sigma_{\rm instr}) = \frac{(SNR)^2}{2g} + \left( \frac{(SNR)^4}{4g} + (SNR)^2 \sigma_{\rm tot}^2 n_{\rm eff}  \right),
+    C(SNR, n_{\rm eff}, B, \sigma_{\rm instr}) = \frac{(SNR)^2}{2g} + \left( \frac{(SNR)^4}{4g^2} + (SNR)^2 \sigma_{\rm tot}^2 n_{\rm eff}  \right),
 \end{equation}
 where we have defined $\sigma_{\rm tot}^2 = (B/g + \sigma_{\rm instr}^2)$ to be the variance coming from background sources (i.e., the sky and instrument read noise).
 The limiting magnitude can then be determined as,
